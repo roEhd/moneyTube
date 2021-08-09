@@ -4,6 +4,7 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.Connection;
+import org.jsoup.select.Elements;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.openqa.selenium.By;
@@ -32,19 +33,33 @@ public class crawlNox {
         //HTTP응답속도보다 자바의 컴파일 속도가 더 빠르기에 대기
         try {Thread.sleep(1000);} catch (InterruptedException e) {}
 
+/*
         //구독자 랭킹 '지역' 으로 변경
         driver.findElement(By.xpath("//*[@id=\"tab-channel\"]/div[1]/div/div[1]/div[1]/div/ul/li[2]/a")).click();
-        //nox 보고서
+        Document html = Jsoup.connect(URL).get();
+
+        //지역 랭킹
+        String rank = html.select("#area-rank > a").text();
+        //구독자, 조회수, 평균조회수, 동영상, 라이브수입
+        Elements baseData = html.select("ul.base-data").select("span.strong");
+        String subscriber = baseData.get(0).text();
+        String view = baseData.get(1).text();
+        String avgView = baseData.get(2).text();
+        Integer video = Integer.parseInt(baseData.get(3).text());
+        String liveIncome = baseData.get(4).text();
+*/
+
+
 
         //유튜브 채널 통계표 '30일' 로 변경
+        driver.findElement(By.xpath("//*[@id=\"tab-channel\"]/div[3]/div[1]/div/span[3]")).click();
+        Document doc = Jsoup.connect(URL).get();
+        Elements tableData = doc.select("div.table-content").select("table.tabla-ui-content");
+        System.out.println(tableData);
 
-        try {
-            Connection conn = Jsoup.connect(URL);
-            Document html = conn.get();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
-        
+
+        //nox 보고서
+
     }
 }
