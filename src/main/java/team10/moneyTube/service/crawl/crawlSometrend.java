@@ -16,20 +16,25 @@ import java.util.ArrayList;
 
 @Data
 @AllArgsConstructor
-class Reputation {
+class Comment {
     private String word;
     private Integer times;
 }
-
+@Data
+@AllArgsConstructor
+class Reputation{
+    private Integer cases;
+    private Double ratio;
+}
 public class crawlSometrend {
 
     private static Integer stringToInt(String in){
-        Integer result = 0;
-        if(in.contains("건")){
-            result = Integer.parseInt(in.replace("건", ""));
 
-        }
-        return result;
+        if(in.contains("건"))
+            in = in.replace("건", "");
+        if(in.contains(","))
+            in = in.replace(",", "");
+        return Integer.parseInt(in);
     }
 
 
@@ -62,25 +67,25 @@ public class crawlSometrend {
 
 
         Elements tableList = html.select("#totalRankList > tr");
-        ArrayList<Reputation> positive = new ArrayList<>();
-        ArrayList<Reputation> negative = new ArrayList<>();
-        ArrayList<Reputation> neutral = new ArrayList<>();
+        ArrayList<Comment> positiveComments = new ArrayList<>();
+        ArrayList<Comment> negativeComments = new ArrayList<>();
+        ArrayList<Comment> neutralComments = new ArrayList<>();
 
         for(Element table : tableList) {
             if(!table.select("td.reputation.positive").isEmpty()) {
-                Reputation r = new Reputation(table.select("td.keyword").text(),
+                Comment r = new Comment(table.select("td.keyword").text(),
                         Integer.parseInt(table.select("td.count").text()));
-                positive.add(r);
+                positiveComments.add(r);
             }
             else if(!table.select("td.reputation.negative").isEmpty()) {
-                Reputation r = new Reputation(table.select("td.keyword").text(),
+                Comment r = new Comment(table.select("td.keyword").text(),
                         Integer.parseInt(table.select("td.count").text()));
-                negative.add(r);
+                negativeComments.add(r);
             }
             else if(!table.select("td.reputation.neutrality").isEmpty()) {
-                Reputation r = new Reputation(table.select("td.keyword").text(),
+                Comment r = new Comment(table.select("td.keyword").text(),
                         Integer.parseInt(table.select("td.count").text()));
-                neutral.add(r);
+                neutralComments.add(r);
             }
         }
 
@@ -88,10 +93,10 @@ public class crawlSometrend {
         Integer positiveNum = stringToInt(p.get(0).text());
         Integer negativeNum = stringToInt(p.get(1).text());
         Integer neutralNum = stringToInt(p.get(2).text());
-
-
-
-
+        Integer sum = positiveNum + negativeNum + neutralNum;
+        Reputation positive = new Reputation(positiveNum, positiveNum.doubleValue()/sum*100);
+        Reputation negative = new Reputation(negativeNum, negativeNum.doubleValue()/sum*100);
+        Reputation neutral = new Reputation(neutralNum, neutralNum.doubleValue()/sum*100);
 
     }
 }
